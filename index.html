@@ -223,11 +223,30 @@
   .footer .frow { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
   .footer button { font:inherit; color:var(--muted); background:none; border:none; text-decoration:underline; cursor:pointer; }
   .sample { color:var(--accent) !important; }
+
+  .acct-bar { display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px 10px 8px 12px; margin-bottom:12px; box-shadow:var(--shadow); }
+  .acct-info { color:var(--muted); font-size:12.5px; display:flex; align-items:center; gap:8px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .acct-sync { color:var(--accent); font-size:11px; flex:0 0 auto; }
+  .acct-btn { font:inherit; font-size:12.5px; font-weight:700; color:var(--text); background:var(--chip); border:1px solid var(--border); border-radius:9px; padding:7px 12px; cursor:pointer; white-space:nowrap; flex:0 0 auto; }
+  .acct-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:18px; z-index:100; }
+  .modal.hidden { display:none; }
+  .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; width:100%; max-width:360px; box-shadow:0 12px 44px rgba(0,0,0,.35); }
+  .modal-title { font-weight:800; font-size:16px; margin-bottom:14px; }
+  .modal-box input { width:100%; font:inherit; font-size:14px; color:var(--text); background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:11px 12px; margin-bottom:10px; }
+  .modal-box input:focus { outline:2px solid color-mix(in srgb,var(--accent) 55%,transparent); border-color:transparent; }
+  .auth-err { color:var(--danger); font-size:12.5px; min-height:16px; margin-bottom:8px; }
+  .modal-actions { display:flex; gap:8px; }
+  .modal-actions .acct-btn { flex:1; text-align:center; padding:11px 8px; }
+  .modal-close { display:block; width:100%; margin-top:10px; font:inherit; font-size:13px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline; }
+  .modal-note { font-size:11px; color:var(--muted); margin-top:12px; text-align:center; line-height:1.5; }
 </style>
 
 <div class="wrap">
   <h1 class="app-title">本当に使えるお金</h1>
   <p class="app-sub">銀行残高から、これから出ていくお金（カード・固定費・単発）を引いた「今すぐ安全に使える額」</p>
+
+  <div class="acct-bar" id="acctBar"></div>
 
   <div class="tabs">
     <button class="tab active" data-tab="home">🏠 ホーム</button>
@@ -344,6 +363,21 @@
     </section>
     <section class="card" id="dayDetail"></section>
   </div>
+
+  <div id="authModal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-title">ログイン / 新規登録</div>
+      <input id="authEmail" type="email" inputmode="email" autocomplete="username" placeholder="メールアドレス" />
+      <input id="authPw" type="password" autocomplete="current-password" placeholder="パスワード（6文字以上）" />
+      <div id="authErr" class="auth-err"></div>
+      <div class="modal-actions">
+        <button id="authLogin" class="acct-btn primary">ログイン</button>
+        <button id="authSignup" class="acct-btn">新規登録</button>
+      </div>
+      <button id="authClose" class="modal-close">閉じる</button>
+      <div class="modal-note">初めての方は「新規登録」。ログインするとデータがクラウド保存され、別の端末でも同じデータを使えます。パスワードはSupabaseに安全に保存され、アプリ側・開発者からは見えません。</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -428,7 +462,8 @@
   var state = load() || blank();
 
   function blank(){ return { accounts:[], assets:[], cards:[], fixed:[], income:{enabled:false,label:"",amount:0,day:25,accountId:""}, oneoffIn:[], oneoffOut:[] }; }
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function save(){ saveLocal(); scheduleCloudSave(); }
   function normalize(s){
     if(!s||typeof s!=="object") return blank();
     s.accounts=s.accounts||[]; s.assets=s.assets||[]; s.cards=s.cards||[]; s.fixed=s.fixed||[];
@@ -987,6 +1022,40 @@
   }
   function renderAll(){ setFixedEditUI(); renderList("accounts"); renderList("assets"); renderList("fixed"); renderList("oneoffIn"); renderCards(); renderOneoffOut(); renderIncome(); computeAll(); if(isDashActive()) renderDashboard(); }
 
+  // ---- cloud sync (Supabase) ----
+  var SB_URL="https://vcpkaacherasmbttekui.supabase.co", SB_KEY="sb_publishable_BXAffWoA05F-me9XjAaY7g_lNZmpJI8", SKEY="usableMoney.session";
+  var session=null, cloudTimer=null;
+  function loadSession(){ try{ var r=localStorage.getItem(SKEY); session=r?JSON.parse(r):null; }catch(e){ session=null; } }
+  function saveSession(){ try{ if(session) localStorage.setItem(SKEY, JSON.stringify(session)); else localStorage.removeItem(SKEY); }catch(e){} }
+  function setSession(resp){ session={ access_token:resp.access_token, refresh_token:resp.refresh_token, expires_at: resp.expires_at||(Math.floor(Date.now()/1000)+(resp.expires_in||3600)), user:{ id:(resp.user&&resp.user.id)||"", email:(resp.user&&resp.user.email)||"" } }; saveSession(); }
+  function sbAuth(path, body){ return fetch(SB_URL+"/auth/v1/"+path, { method:"POST", headers:{ "apikey":SB_KEY, "Content-Type":"application/json" }, body:JSON.stringify(body) }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,body:j}; }); }); }
+  function ensureToken(){ if(!session) return Promise.reject("nosession"); if(Math.floor(Date.now()/1000) < session.expires_at-60) return Promise.resolve(); return sbAuth("token?grant_type=refresh_token", {refresh_token:session.refresh_token}).then(function(res){ if(res.ok&&res.body.access_token){ setSession(res.body); return; } throw "refresh_failed"; }); }
+  function cloudLoad(){ return ensureToken().then(function(){ return fetch(SB_URL+"/rest/v1/money_app_data?select=data&user_id=eq."+encodeURIComponent(session.user.id), { headers:{ "apikey":SB_KEY, "Authorization":"Bearer "+session.access_token } }).then(function(r){ return r.json(); }).then(function(rows){ return (rows&&rows[0])?rows[0].data:null; }); }); }
+  function cloudSaveNow(){ if(!session) return Promise.resolve(); return ensureToken().then(function(){ setSyncUI("saving"); return fetch(SB_URL+"/rest/v1/money_app_data", { method:"POST", headers:{ "apikey":SB_KEY, "Authorization":"Bearer "+session.access_token, "Content-Type":"application/json", "Prefer":"resolution=merge-duplicates" }, body:JSON.stringify({ user_id:session.user.id, data:state, updated_at:new Date().toISOString() }) }).then(function(r){ if(!r.ok) throw "save_"+r.status; setSyncUI("saved"); }); }).catch(function(){ setSyncUI("error"); }); }
+  function scheduleCloudSave(){ if(!session) return; setSyncUI("saving"); if(cloudTimer) clearTimeout(cloudTimer); cloudTimer=setTimeout(function(){ cloudTimer=null; cloudSaveNow(); }, 1500); }
+  function flushCloudSave(){ if(cloudTimer){ clearTimeout(cloudTimer); cloudTimer=null; } return cloudSaveNow(); }
+  function doSignUp(email,pw){ return sbAuth("signup", {email:email,password:pw}).then(function(res){ if(res.ok&&res.body.access_token){ setSession(res.body); return {ok:true}; } if(res.ok&&!res.body.access_token){ return {ok:false,needConfirm:true}; } return {ok:false,error:(res.body.msg||res.body.error_description||res.body.error||"登録できませんでした")}; }); }
+  function doSignIn(email,pw){ return sbAuth("token?grant_type=password", {email:email,password:pw}).then(function(res){ if(res.ok&&res.body.access_token){ setSession(res.body); return {ok:true}; } return {ok:false,error:(res.body.error_description||res.body.msg||"メールまたはパスワードが違います")}; }); }
+  function hasData(d){ return d&&((d.accounts&&d.accounts.length)||(d.cards&&d.cards.length)||(d.fixed&&d.fixed.length)||(d.oneoffOut&&d.oneoffOut.length)||(d.oneoffIn&&d.oneoffIn.length)||(d.assets&&d.assets.length)||(d.income&&num(d.income.amount))); }
+  function afterAuth(){ return cloudLoad().then(function(data){ if(hasData(data)){ state=normalize(data); expanded={}; fixedEdit=false; saveLocal(); renderAll(); setSyncUI("saved"); } else { saveLocal(); return flushCloudSave(); } }).catch(function(){ setSyncUI("error"); }); }
+  function setSyncUI(s){ var e=el("syncStatus"); if(!e) return; e.textContent = s==="saving"?"同期中…":(s==="saved"?"✓ 同期済み":(s==="error"?"⚠️ 同期エラー":"")); }
+  function renderAccountBar(){ var bar=el("acctBar"); if(!bar) return; if(session){ bar.innerHTML='<span class="acct-info">☁ '+esc(session.user.email||"ログイン中")+' <span id="syncStatus" class="acct-sync"></span></span><button class="acct-btn" data-act="logout">ログアウト</button>'; } else { bar.innerHTML='<span class="acct-info">👤 ゲスト（この端末に保存）</span><button class="acct-btn primary" data-act="login">ログイン / 新規登録</button>'; } }
+  function openAuthModal(){ el("authEmail").value=""; el("authPw").value=""; el("authErr").textContent=""; el("authModal").classList.remove("hidden"); el("authEmail").focus(); }
+  function closeAuthModal(){ el("authModal").classList.add("hidden"); }
+  function submitAuth(mode){
+    var email=el("authEmail").value.trim(), pw=el("authPw").value;
+    el("authErr").textContent="";
+    if(!email||!pw){ el("authErr").textContent="メールとパスワードを入力してください。"; return; }
+    if(pw.length<6){ el("authErr").textContent="パスワードは6文字以上にしてください。"; return; }
+    el("authErr").textContent="処理中…";
+    (mode==="signup"?doSignUp(email,pw):doSignIn(email,pw)).then(function(res){
+      if(res.ok){ closeAuthModal(); renderAccountBar(); setSyncUI("saving"); afterAuth().then(function(){ renderAccountBar(); }); }
+      else if(res.needConfirm){ el("authErr").textContent="確認メールを送信しました。メールのリンクを開いてください。"; }
+      else { el("authErr").textContent=res.error||"失敗しました。"; }
+    }).catch(function(){ el("authErr").textContent="通信エラー。ネット接続を確認してください。"; });
+  }
+  function doLogout(){ if(!confirm("ログアウトします。この端末の表示は空になります（データはクラウドに保存済み）。")) return; flushCloudSave().then(function(){ session=null; saveSession(); state=blank(); expanded={}; fixedEdit=false; saveLocal(); renderAll(); renderAccountBar(); }); }
+
   // ---- init ----
   ["accounts","assets","fixed","oneoffIn"].forEach(wireList);
   wireCards(); wireOneoffOut();
@@ -1042,5 +1111,16 @@
   setFixedEditUI();
   renderList("accounts"); renderList("assets"); renderList("fixed"); renderList("oneoffIn"); renderCards(); renderOneoffOut(); renderIncome();
   computeAll();
+
+  // account / cloud
+  loadSession();
+  renderAccountBar();
+  el("acctBar").addEventListener("click", function(e){ var b=e.target.closest("[data-act]"); if(!b) return; if(b.dataset.act==="login") openAuthModal(); else if(b.dataset.act==="logout") doLogout(); });
+  el("authLogin").addEventListener("click", function(){ submitAuth("login"); });
+  el("authSignup").addEventListener("click", function(){ submitAuth("signup"); });
+  el("authClose").addEventListener("click", closeAuthModal);
+  el("authModal").addEventListener("click", function(e){ if(e.target===el("authModal")) closeAuthModal(); });
+  el("authPw").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAuth("login"); });
+  if(session){ setSyncUI("saving"); ensureToken().then(cloudLoad).then(function(data){ if(hasData(data)){ state=normalize(data); expanded={}; fixedEdit=false; saveLocal(); renderAll(); } setSyncUI("saved"); }).catch(function(){ session=null; saveSession(); renderAccountBar(); }); }
 })();
 </script>
