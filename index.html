@@ -240,49 +240,154 @@
   .modal-actions .acct-btn { flex:1; text-align:center; padding:11px 8px; }
   .modal-close { display:block; width:100%; margin-top:10px; font:inherit; font-size:13px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline; }
   .modal-note { font-size:11px; color:var(--muted); margin-top:12px; text-align:center; line-height:1.5; }
+
+  /* ===== MATSUPO redesign (fintech, dark-first) ===== */
+  :root { --bg:#f4f6f9; --surface:#ffffff; --chip:#eef2f6; --border:#e4e9f0; --text:#0f1720; --muted:#5c6773; --accent:#0ea885; --inflow:#0ea885; --danger:#e0484d; --warn:#d98324; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#080b10; --surface:#0f1621; --chip:#0c121b; --border:#1e2734; --text:#e9eef5; --muted:#8a95a4; --accent:#2ee6c6; --inflow:#34d399; --danger:#f2565b; --warn:#f5a623; } }
+  :root[data-theme="dark"] { --bg:#080b10; --surface:#0f1621; --chip:#0c121b; --border:#1e2734; --text:#e9eef5; --muted:#8a95a4; --accent:#2ee6c6; --inflow:#34d399; --danger:#f2565b; --warn:#f5a623; }
+  :root[data-theme="light"] { --bg:#f4f6f9; --surface:#ffffff; --chip:#eef2f6; --border:#e4e9f0; --text:#0f1720; --muted:#5c6773; --accent:#0ea885; --inflow:#0ea885; --danger:#e0484d; --warn:#d98324; }
+
+  .wrap { max-width:1160px; padding:16px 18px 64px; }
+
+  .topbar { display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+  .topbar .brand-icon { width:44px; height:28px; }
+  .tb-left { display:flex; align-items:center; gap:11px; }
+  .tb-brand { display:flex; flex-direction:column; line-height:1.05; }
+  .tb-brand .brand-name { font-size:18px; letter-spacing:.2em; padding-left:.2em; color:var(--text); }
+  .tb-tag { font-size:10.5px; color:var(--muted); }
+  .tb-nav { display:flex; gap:4px; margin:0 auto; background:var(--chip); padding:5px; border-radius:14px; max-width:100%; overflow-x:auto; }
+  .tb-nav .tab { flex:0 0 auto; font:inherit; font-weight:700; font-size:13px; color:var(--muted); background:transparent; border:none; border-radius:10px; padding:9px 16px; cursor:pointer; white-space:nowrap; }
+  .tb-nav .tab.active { background:var(--surface); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.25); }
+  .tb-right { display:flex; align-items:center; margin-left:auto; }
+  .tb-right.acct-bar { background:transparent; border:none; box-shadow:none; padding:0; margin:0; }
+
+  .top-row { display:grid; grid-template-columns:1.85fr 1fr; gap:16px; margin-bottom:16px; align-items:start; }
+  .top-row.single { grid-template-columns:1fr; }
+  @media (max-width:840px) { .top-row { grid-template-columns:1fr; } }
+
+  .hero { position:relative; overflow:hidden; background:var(--surface); border:1px solid var(--border); border-radius:20px; color:var(--text); padding:22px 24px 20px; margin:0; box-shadow:none; }
+  .hero.negative { background:var(--surface); }
+  .hero-glow { position:absolute; top:-140px; left:-30px; width:560px; height:320px; border-radius:50%; background:radial-gradient(closest-side, color-mix(in srgb, var(--accent) 34%, transparent), transparent); pointer-events:none; opacity:.5; }
+  .hero-top { position:relative; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .hero-label { color:var(--muted); opacity:1; font-weight:600; }
+  .hero-toggle { font:inherit; font-size:12px; font-weight:600; color:var(--muted); background:var(--chip); border:1px solid var(--border); border-radius:10px; padding:7px 13px; cursor:pointer; white-space:nowrap; }
+  .hero-amount { position:relative; color:var(--text); font-size:46px; }
+  .hero-note { position:relative; color:var(--muted); opacity:1; }
+  .hero-updated { position:relative; font-size:11px; color:var(--muted); margin:4px 0 0; }
+  .hero-assets { position:relative; color:var(--muted); opacity:1; }
+  .hero-assets b { color:var(--text); }
+  .breakdown { position:relative; display:flex; align-items:stretch; gap:9px; flex-wrap:wrap; margin-top:16px; border-top:1px solid var(--border); padding-top:16px; }
+  .breakdown.collapsed { display:none; }
+  .hb-box { flex:1 1 120px; background:var(--chip); border:1px solid var(--border); border-radius:12px; padding:10px 13px; display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .hb-box.result { background:color-mix(in srgb, var(--accent) 13%, var(--surface)); border-color:color-mix(in srgb, var(--accent) 40%, var(--border)); }
+  .hb-l { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hb-v { font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .hb-box.result .hb-v { color:var(--accent); }
+  .hb-op { align-self:center; color:var(--muted); font-size:15px; font-weight:800; flex:0 0 auto; }
+
+  .alert { margin:0; }
+
+  .cards-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px; }
+  @media (max-width:980px) { .cards-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px) { .cards-grid { grid-template-columns:1fr; } }
+  .mc { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; display:flex; flex-direction:column; }
+  .mc-head { display:flex; align-items:center; gap:8px; margin-bottom:13px; }
+  .mc-ic { font-size:16px; }
+  .mc-title { font-weight:700; font-size:12.5px; flex:1; color:var(--text); }
+  .mc-total { font-weight:800; font-size:14px; font-variant-numeric:tabular-nums; color:var(--text); white-space:nowrap; }
+  .mc-total.neg { color:var(--danger); }
+  .mc-rows { display:grid; gap:10px; flex:1; align-content:start; }
+  .mc-row { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; }
+  .mc-nm { color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mc-sub { color:var(--muted); font-size:11px; }
+  .mc-val { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
+  .mc-val.neg { color:var(--danger); }
+  .mc-empty { color:var(--muted); font-size:12.5px; padding:6px 0; }
+  .mc-link { margin-top:13px; font:inherit; font-size:12.5px; font-weight:600; color:var(--accent); background:var(--chip); border:1px solid var(--border); border-radius:10px; padding:9px; cursor:pointer; text-align:center; }
+  .mc-link:hover { border-color:var(--accent); }
+  .flow-rows { display:grid; gap:11px; flex:1; align-content:center; }
+  .flow-r { display:flex; align-items:center; gap:8px; }
+  .flow-tag { font-size:11px; font-weight:700; width:26px; flex:0 0 auto; }
+  .flow-tag.in { color:var(--inflow); } .flow-tag.out { color:var(--danger); }
+  .flow-track { flex:1; height:8px; background:var(--chip); border-radius:5px; overflow:hidden; }
+  .flow-fill { height:100%; border-radius:5px; min-width:2px; }
+  .flow-fill.in { background:var(--inflow); } .flow-fill.out { background:var(--danger); }
+  .flow-v { font-size:11px; font-variant-numeric:tabular-nums; color:var(--muted); width:72px; text-align:right; flex:0 0 auto; }
+
+  .wc { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px 18px; margin-bottom:16px; }
+  .wc-head { margin-bottom:10px; }
+  .wc-title { font-weight:700; font-size:14px; color:var(--text); }
+  .up-list { display:grid; gap:0; }
+  .up-row { display:flex; align-items:center; gap:12px; padding:11px 2px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .up-row:last-child { border-bottom:none; }
+  .up-date { color:var(--muted); font-size:12px; width:56px; flex:0 0 auto; }
+  .up-lbl { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text); }
+  .up-amt { font-variant-numeric:tabular-nums; font-weight:700; white-space:nowrap; }
+  .up-amt.in { color:var(--inflow); } .up-amt.out { color:var(--danger); }
+  .how-row { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:13px 2px; border:none; border-bottom:1px solid var(--border); background:transparent; cursor:pointer; }
+  .how-row:last-child { border-bottom:none; }
+  .how-ic { font-size:18px; flex:0 0 auto; }
+  .how-tx { flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .how-t { font-weight:700; font-size:13.5px; color:var(--text); }
+  .how-d { font-size:11.5px; color:var(--muted); }
+  .how-s { font-size:12px; color:var(--accent); font-weight:700; white-space:nowrap; }
+  .how-cv { color:var(--muted); font-size:16px; flex:0 0 auto; }
 </style>
 
 <div class="wrap">
-  <div class="brand">
-    <svg class="brand-icon" viewBox="0 0 150 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MATSUPO ロゴ">
-      <defs>
-        <linearGradient id="mgWallet" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#6ee7d3" />
-          <stop offset="55%" stop-color="#22c9a3" />
-          <stop offset="100%" stop-color="#10b981" />
-        </linearGradient>
-      </defs>
-      <line x1="8" y1="34" x2="44" y2="34" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
-      <line x1="0" y1="50" x2="46" y2="50" stroke="#22c9a3" stroke-width="6.5" stroke-linecap="round" opacity="0.92" />
-      <line x1="10" y1="66" x2="42" y2="66" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
-      <rect x="52" y="24" width="88" height="54" rx="15" fill="url(#mgWallet)" />
-      <rect x="52" y="24" width="88" height="22" rx="15" fill="#ffffff" opacity="0.16" />
-      <circle cx="121" cy="51" r="7.5" fill="#ffffff" opacity="0.92" />
-      <circle cx="121" cy="51" r="3.2" fill="#0f9b7a" />
-    </svg>
-    <span class="brand-name">MATSUPO</span>
-  </div>
-  <p class="app-sub">本当に使えるお金 ― 銀行残高から出ていくお金（カード・固定費・単発）を引いた「今すぐ使える額」</p>
-
-  <div class="acct-bar" id="acctBar"></div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="home">🏠 ホーム</button>
-    <button class="tab" data-tab="dashboard">📊 分析</button>
-    <button class="tab" data-tab="oneoff">💸 単発</button>
-    <button class="tab" data-tab="calendar">📅 予定</button>
-  </div>
+  <header class="topbar">
+    <div class="tb-left">
+      <svg class="brand-icon" viewBox="0 0 150 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MATSUPO ロゴ">
+        <defs>
+          <linearGradient id="mgWallet" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6ee7d3" />
+            <stop offset="55%" stop-color="#22c9a3" />
+            <stop offset="100%" stop-color="#10b981" />
+          </linearGradient>
+        </defs>
+        <line x1="8" y1="34" x2="44" y2="34" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
+        <line x1="0" y1="50" x2="46" y2="50" stroke="#22c9a3" stroke-width="6.5" stroke-linecap="round" opacity="0.92" />
+        <line x1="10" y1="66" x2="42" y2="66" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
+        <rect x="52" y="24" width="88" height="54" rx="15" fill="url(#mgWallet)" />
+        <rect x="52" y="24" width="88" height="22" rx="15" fill="#ffffff" opacity="0.16" />
+        <circle cx="121" cy="51" r="7.5" fill="#ffffff" opacity="0.92" />
+        <circle cx="121" cy="51" r="3.2" fill="#0f9b7a" />
+      </svg>
+      <div class="tb-brand"><span class="brand-name">MATSUPO</span><span class="tb-tag">本当に使えるお金</span></div>
+    </div>
+    <nav class="tb-nav">
+      <button class="tab active" data-tab="home">🏠 ホーム</button>
+      <button class="tab" data-tab="analysis">📊 分析</button>
+      <button class="tab" data-tab="account">🏦 口座</button>
+      <button class="tab" data-tab="card">💳 カード</button>
+      <button class="tab" data-tab="schedule">📅 予定</button>
+    </nav>
+    <div class="tb-right acct-bar" id="acctBar"></div>
+  </header>
 
   <div id="tab-home" class="panel active">
-    <div class="hero" id="hero">
-      <p class="hero-label">今、本当に使えるお金</p>
-      <div class="hero-amount" id="usable">¥0</div>
-      <p class="hero-note" id="heroNote"></p>
-      <div class="hero-assets" id="heroAssets"></div>
-      <div class="breakdown" id="breakdown"></div>
+    <div class="top-row" id="topRow">
+      <section class="hero" id="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-top"><p class="hero-label">今、本当に使えるお金</p><button class="hero-toggle" id="bdToggle">内訳を隠す</button></div>
+        <div class="hero-amount" id="usable">¥0</div>
+        <p class="hero-note" id="heroNote"></p>
+        <p class="hero-updated" id="heroUpdated"></p>
+        <div class="hero-assets" id="heroAssets"></div>
+        <div class="breakdown" id="breakdown"></div>
+      </section>
+      <section class="alert" id="alerts" style="display:none"></section>
     </div>
 
-    <section class="alert" id="alerts" style="display:none"></section>
+    <div class="cards-grid">
+      <section class="mc" id="sumAccounts"></section>
+      <section class="mc" id="sumCards"></section>
+      <section class="mc" id="sumFixed"></section>
+      <section class="mc" id="sumFlow"></section>
+    </div>
+
+    <section class="wc" id="homeUpcoming"></section>
+    <section class="wc" id="homeHow"></section>
 
     <details class="help">
       <summary>💡 計算のしくみ</summary>
@@ -292,7 +397,9 @@
         カードは<b>引き落とし日（26日／10日）</b>を選ぶと締め日ルールで計算します。給料や引き落としが土日祝にあたる場合、給料は前営業日・カードは翌営業日に調整。<b>分析</b>タブで固定費の割合や月次の収支を確認できます。
       </div>
     </details>
+  </div>
 
+  <div id="tab-account" class="panel">
     <section class="card">
       <div class="sec-head"><span class="sec-icon">🏦</span><span class="sec-title">銀行口座</span><span class="sec-total plus" id="accountsTotal">¥0</span></div>
       <p class="sec-hint">今の残高をそのまま入力（複数口座OK）</p>
@@ -307,12 +414,6 @@
       <div class="add"><button data-add="assets">＋ 運用資産を追加</button></div>
     </section>
 
-    <section class="card">
-      <div class="sec-head"><span class="sec-icon">💳</span><span class="sec-title">クレジットカード（引き落とし予定）</span><span class="sec-total minus" id="cardsTotal">¥0</span></div>
-      <p class="sec-hint">行をタップして開き、<b>引き落とし日（26日／10日）</b>を選択。各月は明細が出たら<b>「確定」</b>を押す。未確定の月はサブスク額を見込みで加算します</p>
-      <div class="list" id="cardsList"></div>
-      <div class="add"><button data-add="cards">＋ カードを追加</button></div>
-    </section>
 
     <section class="card">
       <div class="sec-head"><span class="sec-icon">📆</span><span class="sec-title">固定費・サブスク（毎月）</span><button class="sec-edit" id="fixedEditBtn">編集</button><span class="sec-total minus" id="fixedTotal">¥0</span></div>
@@ -346,25 +447,18 @@
     </div>
   </div>
 
-  <div id="tab-dashboard" class="panel"><div id="dashBody"></div></div>
-
-  <div id="tab-oneoff" class="panel">
+  <div id="tab-card" class="panel">
     <section class="card">
-      <div class="sec-head"><span class="sec-icon">🎁</span><span class="sec-title">単発の入金</span><span class="sec-total plus" id="oneoffInTotal">¥0</span></div>
-      <p class="sec-hint">ボーナス・経費精算など一度きりの入金。日付を入れるとカレンダーの入金予定・残高予測に反映します</p>
-      <div class="list" id="oneoffInList"></div>
-      <div class="add"><button data-add="oneoffIn">＋ 入金を追加</button></div>
-    </section>
-
-    <section class="card">
-      <div class="sec-head"><span class="sec-icon">💸</span><span class="sec-title">単発の出金</span><span class="sec-total minus" id="oneoffOutTotal">¥0</span></div>
-      <p class="sec-hint">「旅行」などの名前をつけ、内訳ごとに支払い方法を選択。<b>カード払い</b>は購入日を入れると、そのカードの締め日ルールで<b>引き落とし日</b>にカレンダー計上します</p>
-      <div class="list" id="oneoffOutList"></div>
-      <div class="add"><button data-add="oneoffOut">＋ 出金を追加</button></div>
+      <div class="sec-head"><span class="sec-icon">💳</span><span class="sec-title">クレジットカード（引き落とし予定）</span><span class="sec-total minus" id="cardsTotal">¥0</span></div>
+      <p class="sec-hint">行をタップして開き、<b>引き落とし日（26日／10日）</b>を選択。各月は明細が出たら<b>「確定」</b>を押す。未確定の月はサブスク額を見込みで加算します</p>
+      <div class="list" id="cardsList"></div>
+      <div class="add"><button data-add="cards">＋ カードを追加</button></div>
     </section>
   </div>
 
-  <div id="tab-calendar" class="panel">
+  <div id="tab-analysis" class="panel"><div id="dashBody"></div></div>
+
+  <div id="tab-schedule" class="panel">
     <section class="card">
       <div class="cal-head">
         <button class="cal-nav" id="calPrev">‹</button>
@@ -380,6 +474,20 @@
       </div>
     </section>
     <section class="card" id="dayDetail"></section>
+
+    <section class="card">
+      <div class="sec-head"><span class="sec-icon">🎁</span><span class="sec-title">単発の入金</span><span class="sec-total plus" id="oneoffInTotal">¥0</span></div>
+      <p class="sec-hint">ボーナス・経費精算など一度きりの入金。日付を入れるとカレンダーの入金予定・残高予測に反映します</p>
+      <div class="list" id="oneoffInList"></div>
+      <div class="add"><button data-add="oneoffIn">＋ 入金を追加</button></div>
+    </section>
+
+    <section class="card">
+      <div class="sec-head"><span class="sec-icon">💸</span><span class="sec-title">単発の出金</span><span class="sec-total minus" id="oneoffOutTotal">¥0</span></div>
+      <p class="sec-hint">「旅行」などの名前をつけ、内訳ごとに支払い方法を選択。<b>カード払い</b>は購入日を入れると、そのカードの締め日ルールで<b>引き落とし日</b>にカレンダー計上します</p>
+      <div class="list" id="oneoffOutList"></div>
+      <div class="add"><button data-add="oneoffOut">＋ 出金を追加</button></div>
+    </section>
   </div>
 
   <div id="authModal" class="modal hidden">
@@ -831,11 +939,13 @@
     el("heroNote").textContent = usable<0 ? "⚠️ 引き落とし・出金予定を引くとマイナスです。入金予定はカレンダーで確認を。" : "この金額まで自由に使えます。給料など今後の入金はカレンダーで確認できます。";
     el("heroAssets").innerHTML="合計資産 <b>"+yen(totalAssets)+"</b>"+(asset?" ・ うち運用 "+yen(asset):"");
 
-    var rows=[ {l:"銀行残高 合計", v:"＋"+yen(bank)}, {l:"カード引き落とし予定", v:cardT?"−"+yen(cardT):yen(0)}, {l:"固定費（口座払い）", v:bankFixed?"−"+yen(bankFixed):yen(0)} ];
-    if(ooCommitted>0) rows.push({l:"単発の出金（今後）", v:"−"+yen(ooCommitted)});
-    var html=rows.map(function(r){ return '<div class="bd-row"><span>'+r.l+'</span><span class="v">'+r.v+"</span></div>"; }).join("");
-    html+='<div class="bd-row total"><span>今 使えるお金</span><span class="v">'+yen(usable)+"</span></div>";
-    el("breakdown").innerHTML=html;
+    var bx=[ {l:"銀行残高 合計", v:yen(bank)}, {l:"カード引き落とし予定", v:yen(cardT)}, {l:"固定費（口座払い）", v:yen(bankFixed)} ];
+    if(ooCommitted>0) bx.push({l:"単発の出金（今後）", v:yen(ooCommitted)});
+    var bh="";
+    bx.forEach(function(r,i){ if(i>0) bh+='<span class="hb-op">−</span>'; bh+='<div class="hb-box"><span class="hb-l">'+r.l+'</span><span class="hb-v">'+r.v+'</span></div>'; });
+    bh+='<span class="hb-op">=</span><div class="hb-box result"><span class="hb-l">今 使えるお金</span><span class="hb-v">'+yen(usable)+'</span></div>';
+    el("breakdown").innerHTML=bh;
+    var hu=el("heroUpdated"); if(hu){ var nd=new Date(); hu.textContent="最終更新 "+nd.getFullYear()+"/"+pad(nd.getMonth()+1)+"/"+pad(nd.getDate())+" "+pad(nd.getHours())+":"+pad(nd.getMinutes()); }
   }
 
   // ---- dashboard ----
@@ -914,8 +1024,9 @@
   function renderAlerts(){
     var box=el("alerts"); if(!box) return;
     var bad=accountProjection().filter(function(p){ return p.firstNeg; });
-    if(!bad.length){ box.style.display="none"; box.innerHTML=""; return; }
-    box.style.display="";
+    var tr=el("topRow");
+    if(!bad.length){ box.style.display="none"; box.innerHTML=""; if(tr) tr.classList.add("single"); return; }
+    box.style.display=""; if(tr) tr.classList.remove("single");
     var items=bad.map(function(p){ return '<div class="alert-item">🔴 <b>'+esc(p.account.name||"口座")+"</b>：<b>"+fmtMD(p.firstNeg)+"</b> までに <b>"+yen(p.need)+"</b> 入金が必要（残高不足になります）</div>"; }).join("");
     box.innerHTML='<div class="alert-title">⚠️ 入金アラート</div>'+items+'<div class="alert-hint">カード・固定費・給料・単発に引き落とし口座を設定すると精度が上がります。</div>';
   }
@@ -1005,9 +1116,39 @@
     box.innerHTML=html;
   }
 
-  function isDashActive(){ var t=el("tab-dashboard"); return t&&t.classList.contains("active"); }
-  function lightCompute(){ compute(); renderAlerts(); if(isDashActive()) renderDashboard(); }
-  function computeAll(){ compute(); renderAlerts(); renderCalendar(); if(isDashActive()) renderDashboard(); }
+  function miniCard(ic,title,val,neg,rows,go,link){
+    return '<div class="mc-head"><span class="mc-ic">'+ic+'</span><span class="mc-title">'+title+'</span><span class="mc-total'+(neg?" neg":"")+'">'+val+'</span></div><div class="mc-rows">'+rows+'</div><button class="mc-link" data-goto="'+go+'">'+link+' ›</button>';
+  }
+  function renderHome(){
+    if(!el("sumAccounts")) return;
+    var today=todayStr();
+    var bankTotal=sum(state.accounts);
+    var accRows = state.accounts.length ? state.accounts.slice(0,3).map(function(a){ return '<div class="mc-row"><span class="mc-nm">'+esc(a.name||"口座")+'</span><span class="mc-val">'+yen(num(a.amount))+'</span></div>'; }).join("") : '<div class="mc-empty">未登録</div>';
+    el("sumAccounts").innerHTML=miniCard("🏦","銀行口座",yen(bankTotal),false,accRows,"account","すべての口座を見る");
+    var cardT=0, payList=[];
+    state.cards.forEach(function(c){ (c.payments||[]).forEach(function(p){ var e=effectivePay(c,p); cardT+=e; payList.push({name:c.name,date:p.date,amt:e}); }); });
+    payList.sort(function(a,b){ return (a.date||"")<(b.date||"")?-1:1; });
+    var cardRows = payList.length ? payList.slice(0,3).map(function(p){ return '<div class="mc-row"><span class="mc-nm">'+esc(p.name||"カード")+' <span class="mc-sub">'+(p.date?"("+fmtMD(p.date)+")":"")+'</span></span><span class="mc-val neg">'+yen(p.amt)+'</span></div>'; }).join("") : '<div class="mc-empty">未登録</div>';
+    el("sumCards").innerHTML=miniCard("💳","カード引き落とし予定",yen(cardT),true,cardRows,"card","すべてのカードを見る");
+    var fixedTotal=sum(state.fixed);
+    var fixedRows = state.fixed.length ? state.fixed.slice().sort(function(a,b){ return num(b.amount)-num(a.amount); }).slice(0,4).map(function(f){ return '<div class="mc-row"><span class="mc-nm">'+catIcon(f.category)+" "+esc(f.name||"固定費")+'</span><span class="mc-val">'+yen(num(f.amount))+'</span></div>'; }).join("") : '<div class="mc-empty">未登録</div>';
+    el("sumFixed").innerHTML=miniCard("📆","固定費（毎月）",yen(fixedTotal),true,fixedRows,"account","すべての固定費を見る");
+    var m=monthlyAgg()[0], mx=Math.max(1,m.inc,m.exp);
+    el("sumFlow").innerHTML='<div class="mc-head"><span class="mc-ic">📈</span><span class="mc-title">月間キャッシュフロー</span></div>'+
+      '<div class="flow-rows">'+
+      '<div class="flow-r"><span class="flow-tag in">収入</span><div class="flow-track"><div class="flow-fill in" style="width:'+(m.inc/mx*100)+'%"></div></div><span class="flow-v">'+yen(m.inc)+'</span></div>'+
+      '<div class="flow-r"><span class="flow-tag out">支出</span><div class="flow-track"><div class="flow-fill out" style="width:'+(m.exp/mx*100)+'%"></div></div><span class="flow-v">'+yen(m.exp)+'</span></div>'+
+      '</div><button class="mc-link" data-goto="analysis">詳細を分析する ›</button>';
+    var evs=allEvents().filter(function(e){ return e.date>=today; }).sort(function(a,b){ return a.date<b.date?-1:(a.date>b.date?1:0); }).slice(0,6);
+    var upRows = evs.length ? evs.map(function(e){ var sign=e.signed<0?"−":"＋", c=e.signed<0?"out":"in"; return '<div class="up-row"><span class="up-date">'+fmtMD(e.date)+'</span><span class="up-lbl">'+esc(e.label)+'</span><span class="up-amt '+c+'">'+sign+yen(e.amount)+'</span></div>'; }).join("") : '<div class="mc-empty">今後の予定はありません</div>';
+    el("homeUpcoming").innerHTML='<div class="wc-head"><span class="wc-title">今後の入出金予定</span></div><div class="up-list">'+upRows+'</div><button class="mc-link" data-goto="schedule">カレンダーで全体を確認する ›</button>';
+    var how=[ {ic:"🏦",t:"銀行口座",d:"残高の合計から計算します",s:state.accounts.length+"口座",go:"account"}, {ic:"💳",t:"カード引き落とし予定",d:"今後の引き落としを合計して差し引きます",s:state.cards.length+"枚",go:"card"}, {ic:"📆",t:"固定費（毎月）",d:"毎月の固定費を合計して差し引きます",s:state.fixed.length+"件",go:"account"}, {ic:"💸",t:"単発の入出金",d:"一度きりの入出金を反映します",s:(state.oneoffIn.length+state.oneoffOut.length)+"件",go:"schedule"} ];
+    el("homeHow").innerHTML='<div class="wc-head"><span class="wc-title">計算のしくみ・設定</span></div>'+how.map(function(r){ return '<button class="how-row" data-goto="'+r.go+'"><span class="how-ic">'+r.ic+'</span><span class="how-tx"><span class="how-t">'+r.t+'</span><span class="how-d">'+r.d+'</span></span><span class="how-s">'+r.s+'</span><span class="how-cv">›</span></button>'; }).join("");
+  }
+  function isActive(id){ var t=el(id); return t&&t.classList.contains("active"); }
+  function isDashActive(){ return isActive("tab-analysis"); }
+  function lightCompute(){ compute(); renderAlerts(); if(isDashActive()) renderDashboard(); if(isActive("tab-home")) renderHome(); }
+  function computeAll(){ compute(); renderAlerts(); renderCalendar(); if(isDashActive()) renderDashboard(); if(isActive("tab-home")) renderHome(); }
 
   function sampleData(){
     var a1={id:uid(),name:"みずほ銀行",amount:320000}, a2={id:uid(),name:"住信SBI",amount:25000};
@@ -1038,7 +1179,7 @@
       ]
     };
   }
-  function renderAll(){ setFixedEditUI(); renderList("accounts"); renderList("assets"); renderList("fixed"); renderList("oneoffIn"); renderCards(); renderOneoffOut(); renderIncome(); computeAll(); if(isDashActive()) renderDashboard(); }
+  function renderAll(){ setFixedEditUI(); renderList("accounts"); renderList("assets"); renderList("fixed"); renderList("oneoffIn"); renderCards(); renderOneoffOut(); renderIncome(); computeAll(); if(isDashActive()) renderDashboard(); renderHome(); }
 
   // ---- cloud sync (Supabase) ----
   var SB_URL="https://vcpkaacherasmbttekui.supabase.co", SB_KEY="sb_publishable_BXAffWoA05F-me9XjAaY7g_lNZmpJI8", SKEY="usableMoney.session";
@@ -1093,10 +1234,13 @@
       qsa(".tab").forEach(function(x){ x.classList.remove("active"); });
       qsa(".panel").forEach(function(x){ x.classList.remove("active"); });
       b.classList.add("active"); el("tab-"+b.dataset.tab).classList.add("active");
-      if(b.dataset.tab==="calendar") renderCalendar();
-      if(b.dataset.tab==="dashboard") renderDashboard();
+      if(b.dataset.tab==="schedule") renderCalendar();
+      if(b.dataset.tab==="analysis") renderDashboard();
+      if(b.dataset.tab==="home") renderHome();
     });
   });
+  el("bdToggle").addEventListener("click", function(){ var b=el("breakdown"); b.classList.toggle("collapsed"); this.textContent=b.classList.contains("collapsed")?"内訳を表示":"内訳を隠す"; });
+  document.addEventListener("click", function(e){ var g=e.target.closest("[data-goto]"); if(!g) return; var t=document.querySelector('.tb-nav .tab[data-tab="'+g.dataset.goto+'"]'); if(t) t.click(); });
   el("calPrev").addEventListener("click", function(){ view.m--; if(view.m<0){view.m=11;view.y--;} renderCalendar(); });
   el("calNext").addEventListener("click", function(){ view.m++; if(view.m>11){view.m=0;view.y++;} renderCalendar(); });
   el("calGrid").addEventListener("click", function(e){ var c=e.target.closest(".cell"); if(!c||!c.dataset.date) return; selected=c.dataset.date; renderCalendar(); });
