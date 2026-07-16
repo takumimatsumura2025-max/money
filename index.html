@@ -1,6 +1,4 @@
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>本当に使えるお金</title>
+<title>MATSUPO ― 本当に使えるお金</title>
 <style>
   :root {
     --bg:#f4f5f7; --surface:#ffffff; --text:#191c20; --muted:#697280;
@@ -36,8 +34,10 @@
   html,body { margin:0; }
   body { background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif; line-height:1.5; -webkit-text-size-adjust:100%; }
   .wrap { max-width:680px; margin:0 auto; padding:18px 14px 72px; }
-  .app-title { font-size:20px; font-weight:800; margin:2px 0 2px; }
-  .app-sub { color:var(--muted); font-size:12.5px; margin:0 0 14px; }
+  .brand { display:flex; flex-direction:column; align-items:center; gap:2px; margin:4px 0 4px; }
+  .brand-icon { width:94px; height:60px; display:block; }
+  .brand-name { font-weight:800; font-size:23px; letter-spacing:.26em; color:var(--text); padding-left:.26em; line-height:1; }
+  .app-sub { color:var(--muted); font-size:12px; margin:2px 0 14px; text-align:center; }
 
   .tabs { display:flex; gap:5px; margin-bottom:16px; background:var(--chip); padding:4px; border-radius:12px; }
   .tab { flex:1; font:inherit; font-weight:700; font-size:12.5px; color:var(--muted); background:transparent; border:none; border-radius:9px; padding:9px 3px; cursor:pointer; white-space:nowrap; }
@@ -243,8 +243,26 @@
 </style>
 
 <div class="wrap">
-  <h1 class="app-title">本当に使えるお金</h1>
-  <p class="app-sub">銀行残高から、これから出ていくお金（カード・固定費・単発）を引いた「今すぐ安全に使える額」</p>
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 150 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MATSUPO ロゴ">
+      <defs>
+        <linearGradient id="mgWallet" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6ee7d3" />
+          <stop offset="55%" stop-color="#22c9a3" />
+          <stop offset="100%" stop-color="#10b981" />
+        </linearGradient>
+      </defs>
+      <line x1="8" y1="34" x2="44" y2="34" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
+      <line x1="0" y1="50" x2="46" y2="50" stroke="#22c9a3" stroke-width="6.5" stroke-linecap="round" opacity="0.92" />
+      <line x1="10" y1="66" x2="42" y2="66" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.5" />
+      <rect x="52" y="24" width="88" height="54" rx="15" fill="url(#mgWallet)" />
+      <rect x="52" y="24" width="88" height="22" rx="15" fill="#ffffff" opacity="0.16" />
+      <circle cx="121" cy="51" r="7.5" fill="#ffffff" opacity="0.92" />
+      <circle cx="121" cy="51" r="3.2" fill="#0f9b7a" />
+    </svg>
+    <span class="brand-name">MATSUPO</span>
+  </div>
+  <p class="app-sub">本当に使えるお金 ― 銀行残高から出ていくお金（カード・固定費・単発）を引いた「今すぐ使える額」</p>
 
   <div class="acct-bar" id="acctBar"></div>
 
